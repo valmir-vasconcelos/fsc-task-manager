@@ -1,15 +1,10 @@
-
+import Sidebar from "./components/Sidebar"
 
 function App() {
 
-  return (
-    <div className="text-red-500">
-
-      <h1>Task Manager</h1>
-
-    </div>
-
-  )
+    return (
+        <Sidebar />
+    )
 }
 
 export default App
