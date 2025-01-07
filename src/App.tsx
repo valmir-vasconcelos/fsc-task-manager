@@ -6,13 +6,7 @@ function App() {
 
     return (
         <div className="flex">
-            <Toaster toastOptions={
-                {
-                    style: {
-                        color: "#35383E"
-                    }
-                }
-            } />
+            <Toaster richColors />
             <Sidebar />
             <Tasks />
         </div>
