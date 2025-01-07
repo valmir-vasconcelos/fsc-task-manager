@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import AddIcon from "../assets/icons/add.svg?react";
 import CloudSunIcon from "../assets/icons/cloud-sun.svg?react";
 import MoonIcon from "../assets/icons/moon.svg?react";
@@ -16,15 +17,25 @@ const Tasks = () => {
   const afternoonTasks = tasks.filter((task) => task.time === "afternoon");
   const eveningTasks = tasks.filter((task) => task.time === "evening");
 
+  const handleTaskDeleteClick = (taskId) => {
+    const newTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(newTasks);
+
+    toast.success("Tarefa removida com sucesso");
+  };
+
   const handleTaskCheckboxClick = (taskId) => {
     const newTasks = tasks.map((task) => {
       if (task.id !== taskId) {
         return task;
       } else if (task.status === "not_started") {
+        toast.success("Tarefa iniciada com sucesso");
         return { ...task, status: "in_progress" };
       } else if (task.status === "in_progress") {
+        toast.success("Tarefa concluída com sucesso");
         return { ...task, status: "done" };
       } else if (task.status === "done") {
+        toast.success("Tarefa reiniciada com sucesso");
         return { ...task, status: "not_started" };
       }
     });
@@ -32,7 +43,7 @@ const Tasks = () => {
   };
 
   return (
-    <div className="w-full px-8 py-16">
+    <div className="w-full space-y-6 px-8 py-16">
       <div className="flex w-full justify-between">
         <div>
           <span className="text-xs font-semibold text-[#00ADB5]">
@@ -60,7 +71,8 @@ const Tasks = () => {
             <TaskItem
               key={task.id}
               task={task}
-              handleTaskCheckboxClick={handleTaskCheckboxClick}
+              handleCheckboxClick={handleTaskCheckboxClick}
+              handleDeleteClick={handleTaskDeleteClick}
             />
           ))}
         </div>
@@ -70,7 +82,8 @@ const Tasks = () => {
             <TaskItem
               key={task.id}
               task={task}
-              handleTaskCheckboxClick={handleTaskCheckboxClick}
+              handleCheckboxClick={handleTaskCheckboxClick}
+              handleDeleteClick={handleTaskDeleteClick}
             />
           ))}
         </div>
@@ -80,7 +93,8 @@ const Tasks = () => {
             <TaskItem
               key={task.id}
               task={task}
-              handleTaskCheckboxClick={handleTaskCheckboxClick}
+              handleCheckboxClick={handleTaskCheckboxClick}
+              handleDeleteClick={handleTaskDeleteClick}
             />
           ))}
         </div>
