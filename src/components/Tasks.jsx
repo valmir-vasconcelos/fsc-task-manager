@@ -8,12 +8,14 @@ import {
   TrashIcon,
 } from "../assets/icons";
 import TASKS from "../service/dados";
+import AddTaskDialog from "./AddTaskDialog";
 import Button from "./Button";
 import TaskItem from "./TaskItem";
 import TaskSeparator from "./TaskSeparator";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState(TASKS);
+  const [addTaskDialogIsOpen, setAddTaskDialogIsOpen] = useState(false);
 
   const morningTasks = tasks.filter((task) => task.time === "morning");
   const afternoonTasks = tasks.filter((task) => task.time === "afternoon");
@@ -58,9 +60,13 @@ const Tasks = () => {
           <Button variant="ghost">
             Limpar tarefas <TrashIcon />
           </Button>
-          <Button variant="primary">
+          <Button
+            onClick={() => setAddTaskDialogIsOpen(true)}
+            variant="primary"
+          >
             Nova tarefa <AddIcon />
           </Button>
+          <AddTaskDialog isOpen={addTaskDialogIsOpen} />
         </div>
       </div>
 
