@@ -1,4 +1,6 @@
 import { createPortal } from "react-dom";
+import Button from "./Button";
+import Input from "./Input";
 
 const AddTaskDialog = ({ isOpen }) => {
   if (!isOpen) {
@@ -13,6 +15,16 @@ const AddTaskDialog = ({ isOpen }) => {
         <p className="mt-1 text-sm text-[#9A9C9F]">
           Insira as informações abaixo
         </p>
+
+        <div className="flex flex-col space-y-4">
+          <Input />
+          <Input />
+          <Input />
+          <div className="flex gap-3">
+            <Button>Cancelar</Button>
+            <Button>Salvar</Button>
+          </div>
+        </div>
       </div>
     </div>,
     document.body
