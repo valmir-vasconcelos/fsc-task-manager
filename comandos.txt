@@ -9,3 +9,6 @@ npm install -D vite-plugin-svgr@4.2.0
 
 // biblioteca para exibição de mensagens
 npm install sonner@1.5.0
+
+// biblioteca para implementar transição
+npm install react-transition-group@4.4.5 --save
