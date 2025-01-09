@@ -12,3 +12,6 @@ npm install sonner@1.5.0
 
 // biblioteca para implementar transição
 npm install react-transition-group@4.4.5 --save
+
+// gerador de UUID
+npm install uuid@10.0.0

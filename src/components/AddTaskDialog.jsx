@@ -1,12 +1,49 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
+import { v4 } from "uuid";
 import "./AddTaskDialog.css";
 import Button from "./Button";
 import Input from "./Input";
+import TimeSelect from "./TimeSelect";
 
-const AddTaskDialog = ({ isOpen, handleClose }) => {
+const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
+  const [errors, setErrors] = useState([]);
+
   const nodeRef = useRef();
+
+  const titleRef = useRef();
+  const descriptionRef = useRef();
+  const timeRef = useRef();
+
+  const handleSaveClick = () => {
+    const newErrors = [];
+
+    const title = titleRef.current.value;
+    const description = descriptionRef.current.value;
+    const time = timeRef.current.value;
+
+    setErrors(newErrors);
+
+    if (newErrors.length > 0) {
+      return;
+    }
+
+    handleSubmit({
+      id: v4(),
+      title,
+      time,
+      description,
+      status: "not_started",
+    });
+    handleClose();
+  };
+
+  const titleError = errors.find((error) => error.inputName === "title");
+  const timeError = errors.find((error) => error.inputName === "time");
+  const descriptionError = errors.find(
+    (error) => error.inputName === "description"
+  );
 
   return (
     <CSSTransition
@@ -36,13 +73,20 @@ const AddTaskDialog = ({ isOpen, handleClose }) => {
                   id="title"
                   label="Título"
                   placeholder="Insira o título da tarefa"
+                  ref={titleRef}
+                  errorMessage={titleError?.message}
                 />
-                <Input id="time" label="Horário" placeholder="Horário" />
+
+                <TimeSelect errorMessage={timeError?.message} ref={timeRef} />
+
                 <Input
                   id="description"
                   label="Descrição"
                   placeholder="Descreva a tarefa"
+                  ref={descriptionRef}
+                  errorMessage={descriptionError?.message}
                 />
+
                 <div className="flex gap-3">
                   <Button
                     size="large"
@@ -52,7 +96,11 @@ const AddTaskDialog = ({ isOpen, handleClose }) => {
                   >
                     Cancelar
                   </Button>
-                  <Button size="large" className="w-full">
+                  <Button
+                    size="large"
+                    className="w-full"
+                    onClick={handleSaveClick}
+                  >
                     Salvar
                   </Button>
                 </div>
