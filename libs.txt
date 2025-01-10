@@ -18,3 +18,10 @@ npm install uuid@10.0.0
 
 // tailwind variants
 npm install tailwind-variants@0.2.1
+
+// prop-types (lib para tipar props em projetos JavaScript, sem TypeScript)
+npm install prop-types@15.8.1
+
+// json-server (simulador de API)
+npm install json-server@1.0.0-beta.1
+npx json-server db.json
