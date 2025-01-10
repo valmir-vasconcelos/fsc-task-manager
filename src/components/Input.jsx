@@ -6,7 +6,7 @@ const Input = forwardRef(({ label, errorMessage, ...rest }, ref) => {
     <div className="flex flex-col space-y-1 text-left">
       <InputLabel htmlFor={rest.id}>{label}</InputLabel>
       <input
-        className="px-4 py-3 border-solid outline-[#00ADB5] border border-[#ECECEC] rounded-lg placeholder:text-sm text-[#9A9C9F]"
+        className="px-4 py-3 border-solid outline-brand-primary border border-[#ECECEC] rounded-lg placeholder:text-sm text-brand-text-gray"
         ref={ref}
         {...rest}
       />

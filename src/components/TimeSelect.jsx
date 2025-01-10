@@ -7,7 +7,7 @@ const TimeSelect = forwardRef((props, ref) => {
       <InputLabel htmlFor="time">Horário</InputLabel>
       <select
         id="time"
-        className="px-4 py-3 border-solid outline-[#00ADB5] border border-[#ECECEC] rounded-lg placeholder:text-sm text-[#9A9C9F]"
+        className="px-4 py-3 border-solid outline-brand-primary border border-[#ECECEC] rounded-lg placeholder:text-sm text-brand-text-gray"
         {...props}
         ref={ref}
       >

@@ -61,10 +61,10 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
           >
             {/* DIALOG */}
             <div className="p-5 rounded-xl text-center bg-white shadow">
-              <h2 className="text-xl font-semibold text-[#35383E]">
+              <h2 className="text-xl font-semibold text-brand-dark-blue">
                 Nova Tarefa
               </h2>
-              <p className="mt-1 mb-4 text-sm text-[#9A9C9F]">
+              <p className="mt-1 mb-4 text-sm text-brand-text-gray">
                 Insira as informações abaixo
               </p>
 
@@ -91,7 +91,7 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
                   <Button
                     size="large"
                     className="w-full"
-                    variant="secondary"
+                    color="secondary"
                     onClick={handleClose}
                   >
                     Cancelar
