@@ -31,3 +31,6 @@ npm install react-router-dom@6.25.1
 
 // reat hook form
 npm install react-hook-form@7.52.1
+
+// react query
+npm install @tanstack/react-query@5.51.21

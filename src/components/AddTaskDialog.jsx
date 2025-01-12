@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { createPortal } from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import { v4 } from "uuid";
@@ -9,75 +9,63 @@ import Input from "./Input";
 import TimeSelect from "./TimeSelect";
 import { toast } from "sonner";
 import { LoaderIcon } from "../assets/icons";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const AddTaskDialog = ({ isOpen, handleClose, onSubmitSuccess }) => {
-  const [errors, setErrors] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+const AddTaskDialog = ({ isOpen, handleClose }) => {
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationKey: "addTask",
+    mutationFn: async (task) => {
+      const response = await fetch("http://localhost:3000/tasks", {
+        method: "POST",
+        body: JSON.stringify(task),
+      });
+      if (!response.ok) {
+        throw new Error();
+      }
+      return response.json();
+    },
+  });
+
+  const {
+    register,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    reset,
+  } = useForm({
+    defaultValues: { title: "", time: "morning", description: "" },
+  });
 
   const nodeRef = useRef();
 
-  const titleRef = useRef();
-  const descriptionRef = useRef();
-  const timeRef = useRef();
+  const handleSaveClick = async (data) => {
+    const task = {
+      id: v4(),
+      title: data.title.trim(),
+      description: data.description.trim(),
+      time: data.time.trim(),
+      status: "not_started",
+    };
 
-  const handleSaveClick = async () => {
-    const newErrors = [];
-
-    const title = titleRef.current.value;
-    const time = timeRef.current.value;
-    const description = descriptionRef.current.value;
-
-    if (!title.trim()) {
-      newErrors.push({
-        inputName: "title",
-        message: "O título é obrigatório",
-      });
-    }
-
-    if (!time.trim()) {
-      newErrors.push({
-        inputName: "time",
-        message: "O Horário é obrigatório",
-      });
-    }
-
-    if (!description.trim()) {
-      newErrors.push({
-        inputName: "description",
-        message: "A descrição é obrigatória",
-      });
-    }
-
-    setErrors(newErrors);
-
-    if (newErrors.length > 0) {
-      return;
-    }
-
-    const task = { id: v4(), title, description, time, status: "not_started" };
-
-    setIsLoading(true);
-
-    const response = await fetch("http://localhost:3000/tasks", {
-      method: "POST",
-      body: JSON.stringify(task),
+    mutate(task, {
+      onSuccess: () => {
+        queryClient.setQueryData("tasks", (currentTasks) => {
+          return [...currentTasks, task];
+        });
+        toast.success("Tarefa adicionada com sucesso");
+        handleClose();
+        reset({ title: "", time: "morning", description: "" });
+      },
+      onError: () => toast.error("Erro ao adicionar tarefa"),
     });
-
-    if (!response.ok) {
-      setIsLoading(false);
-      return toast.error("Erro ao adicionar a tarefa");
-    }
-
-    onSubmitSuccess(task);
-    setIsLoading(false);
-    handleClose();
   };
 
-  const titleError = errors.find((error) => error.inputName === "title");
-  const timeError = errors.find((error) => error.inputName === "time");
-  const descriptionError = errors.find(
-    (error) => error.inputName === "description"
-  );
+  const handleCancelClick = () => {
+    reset({ title: "", time: "morning", description: "" });
+    handleClose();
+  };
 
   return (
     <CSSTransition
@@ -102,29 +90,46 @@ const AddTaskDialog = ({ isOpen, handleClose, onSubmitSuccess }) => {
                 Insira as informações abaixo
               </p>
 
-              <div className="flex w-[336px] flex-col space-y-4">
+              <form
+                onSubmit={handleSubmit(handleSaveClick)}
+                className="flex w-[336px] flex-col space-y-4"
+              >
                 <Input
                   id="title"
                   label="Título"
                   placeholder="Insira o título da tarefa"
-                  ref={titleRef}
-                  errorMessage={titleError?.message}
-                  disabled={isLoading}
+                  errorMessage={errors?.title?.message}
+                  disabled={isSubmitting}
+                  {...register("title", {
+                    required: "O título é obrigatório",
+                    validate: (value) => {
+                      if (value.trim()) return true;
+                      else return "O título não pode ser vazio";
+                    },
+                  })}
                 />
 
                 <TimeSelect
-                  errorMessage={timeError?.message}
-                  ref={timeRef}
-                  disabled={isLoading}
+                  errorMessage={errors?.time?.message}
+                  disabled={isSubmitting}
+                  {...register("time", {
+                    required: "O horário é obrigatório",
+                  })}
                 />
 
                 <Input
                   id="description"
                   label="Descrição"
                   placeholder="Descreva a tarefa"
-                  ref={descriptionRef}
-                  errorMessage={descriptionError?.message}
-                  disabled={isLoading}
+                  errorMessage={errors?.description?.message}
+                  disabled={isSubmitting}
+                  {...register("description", {
+                    required: "A descrição é obrigatória",
+                    validate: (value) => {
+                      if (value.trim()) return true;
+                      else return "O descrição não pode ser vazia";
+                    },
+                  })}
                 />
 
                 <div className="flex gap-3">
@@ -132,21 +137,22 @@ const AddTaskDialog = ({ isOpen, handleClose, onSubmitSuccess }) => {
                     size="large"
                     className="w-full"
                     color="secondary"
-                    onClick={handleClose}
+                    onClick={handleCancelClick}
+                    type="button"
                   >
                     Cancelar
                   </Button>
                   <Button
                     size="large"
                     className="w-full"
-                    onClick={handleSaveClick}
-                    disabled={isLoading}
+                    type="submit"
+                    disabled={isSubmitting}
                   >
-                    {isLoading && <LoaderIcon className="animate-spin" />}
+                    {isSubmitting && <LoaderIcon className="animate-spin" />}
                     Salvar
                   </Button>
                 </div>
-              </div>
+              </form>
             </div>
           </div>,
           document.body
