@@ -7,9 +7,12 @@ import "./AddTaskDialog.css";
 import Button from "./Button";
 import Input from "./Input";
 import TimeSelect from "./TimeSelect";
+import { toast } from "sonner";
+import { LoaderIcon } from "../assets/icons";
 
-const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
+const AddTaskDialog = ({ isOpen, handleClose, onSubmitSuccess }) => {
   const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const nodeRef = useRef();
 
@@ -17,12 +20,33 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
   const descriptionRef = useRef();
   const timeRef = useRef();
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const newErrors = [];
 
     const title = titleRef.current.value;
-    const description = descriptionRef.current.value;
     const time = timeRef.current.value;
+    const description = descriptionRef.current.value;
+
+    if (!title.trim()) {
+      newErrors.push({
+        inputName: "title",
+        message: "O título é obrigatório",
+      });
+    }
+
+    if (!time.trim()) {
+      newErrors.push({
+        inputName: "time",
+        message: "O Horário é obrigatório",
+      });
+    }
+
+    if (!description.trim()) {
+      newErrors.push({
+        inputName: "description",
+        message: "A descrição é obrigatória",
+      });
+    }
 
     setErrors(newErrors);
 
@@ -30,13 +54,22 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
       return;
     }
 
-    handleSubmit({
-      id: v4(),
-      title,
-      time,
-      description,
-      status: "not_started",
+    const task = { id: v4(), title, description, time, status: "not_started" };
+
+    setIsLoading(true);
+
+    const response = await fetch("http://localhost:3000/tasks", {
+      method: "POST",
+      body: JSON.stringify(task),
     });
+
+    if (!response.ok) {
+      setIsLoading(false);
+      return toast.error("Erro ao adicionar a tarefa");
+    }
+
+    onSubmitSuccess(task);
+    setIsLoading(false);
     handleClose();
   };
 
@@ -76,9 +109,14 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
                   placeholder="Insira o título da tarefa"
                   ref={titleRef}
                   errorMessage={titleError?.message}
+                  disabled={isLoading}
                 />
 
-                <TimeSelect errorMessage={timeError?.message} ref={timeRef} />
+                <TimeSelect
+                  errorMessage={timeError?.message}
+                  ref={timeRef}
+                  disabled={isLoading}
+                />
 
                 <Input
                   id="description"
@@ -86,6 +124,7 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
                   placeholder="Descreva a tarefa"
                   ref={descriptionRef}
                   errorMessage={descriptionError?.message}
+                  disabled={isLoading}
                 />
 
                 <div className="flex gap-3">
@@ -101,7 +140,9 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
                     size="large"
                     className="w-full"
                     onClick={handleSaveClick}
+                    disabled={isLoading}
                   >
+                    {isLoading && <LoaderIcon className="animate-spin" />}
                     Salvar
                   </Button>
                 </div>
@@ -118,7 +159,7 @@ const AddTaskDialog = ({ isOpen, handleClose, handleSubmit }) => {
 AddTaskDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   handleClose: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func.isRequired,
 };
 
 export default AddTaskDialog;

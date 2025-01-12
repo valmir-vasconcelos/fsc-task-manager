@@ -25,3 +25,9 @@ npm install prop-types@15.8.1
 // json-server (simulador de API)
 npm install json-server@1.0.0-beta.1
 npx json-server db.json
+
+// react router dom
+npm install react-router-dom@6.25.1
+
+// reat hook form
+npm install react-hook-form@7.52.1

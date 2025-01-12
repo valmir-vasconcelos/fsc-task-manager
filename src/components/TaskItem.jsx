@@ -5,6 +5,7 @@ import DetailsIcon from "../assets/icons/details.svg?react";
 import LoaderIcon from "../assets/icons/loader.svg?react";
 import TrashIcon from "../assets/icons/trash.svg?react";
 import Button from "./Button";
+import { Link } from "react-router-dom";
 
 const TaskItem = ({ task, handleCheckboxClick, onDeleteSuccess }) => {
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
@@ -65,9 +66,11 @@ const TaskItem = ({ task, handleCheckboxClick, onDeleteSuccess }) => {
             <TrashIcon className="text-brand-text-gray" />
           )}
         </Button>
-        <a href="#" className="transition hover:opacity-75">
-          <DetailsIcon />
-        </a>
+        <div className="transition hover:opacity-75">
+          <Link to={`/task/${task.id}`}>
+            <DetailsIcon />
+          </Link>
+        </div>
       </div>
     </div>
   );
