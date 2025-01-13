@@ -10,25 +10,10 @@ import TimeSelect from "./TimeSelect";
 import { toast } from "sonner";
 import { LoaderIcon } from "../assets/icons";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAddTask } from "../hooks/data/use-add-task";
 
 const AddTaskDialog = ({ isOpen, handleClose }) => {
-  const queryClient = useQueryClient();
-
-  const { mutate } = useMutation({
-    mutationKey: "addTask",
-    mutationFn: async (task) => {
-      const response = await fetch("http://localhost:3000/tasks", {
-        method: "POST",
-        body: JSON.stringify(task),
-      });
-      if (!response.ok) {
-        throw new Error();
-      }
-      return response.json();
-    },
-  });
-
+  const { mutate: mutateAddTask } = useAddTask();
   const {
     register,
     formState: { errors, isSubmitting },
@@ -49,11 +34,8 @@ const AddTaskDialog = ({ isOpen, handleClose }) => {
       status: "not_started",
     };
 
-    mutate(task, {
+    mutateAddTask(task, {
       onSuccess: () => {
-        queryClient.setQueryData("tasks", (currentTasks) => {
-          return [...currentTasks, task];
-        });
         toast.success("Tarefa adicionada com sucesso");
         handleClose();
         reset({ title: "", time: "morning", description: "" });

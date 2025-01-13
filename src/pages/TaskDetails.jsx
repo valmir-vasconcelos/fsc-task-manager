@@ -11,7 +11,9 @@ import Input from "../components/Input";
 import TimeSelect from "../components/TimeSelect";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUpdateTask } from "../hooks/data/use-update-task";
+import { useDeleteTask } from "../hooks/data/use-delete-task";
+import { useGetTask } from "../hooks/data/use-get-task";
 
 const TaskDetailsPage = () => {
   const { taskId } = useParams();
@@ -24,67 +26,15 @@ const TaskDetailsPage = () => {
     reset,
   } = useForm();
 
-  const queryClient = useQueryClient();
-
   const { mutate: mutateUpdateTask, isPending: updateTaskIsLoading } =
-    useMutation({
-      mutationKey: ["updateTask", taskId],
-      mutationFn: async (data) => {
-        const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
-          method: "PATCH",
-          body: JSON.stringify({
-            title: data.title.trim(),
-            description: data.description.trim(),
-            time: data.time.trim(),
-          }),
-        });
-
-        if (!response.ok) {
-          return toast.error("Erro ao salvar a tarefa");
-        }
-
-        const updatedTask = await response.json();
-
-        // atualiza o Cache
-        queryClient.setQueryData("tasks", (oldTasks) => {
-          return oldTasks.map((oldTask) => {
-            if (oldTask.id === taskId) {
-              return updatedTask;
-            }
-            return oldTask;
-          });
-        });
-      },
-    });
+    useUpdateTask(taskId);
 
   const { mutate: mutateDeleteTask, isPending: deleteTaskIsLoading } =
-    useMutation({
-      mutationKey: ["deleteTask", taskId],
-      mutationFn: async () => {
-        const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
-          method: "DELETE",
-        });
-        if (!response.ok) {
-          throw new Error();
-        }
-        const deletedTask = await response.json();
+    useDeleteTask(taskId);
 
-        // atualiza o Cache
-        queryClient.setQueryData("tasks", (oldTasks) => {
-          return oldTasks.filter((oldTask) => oldTask.id !== deletedTask.id);
-        });
-      },
-    });
-
-  const { data: task } = useQuery({
-    queryKey: ["task", taskId],
-    queryFn: async () => {
-      const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
-        method: "GET",
-      });
-      const data = await response.json();
-      reset(data);
-    },
+  const { data: task } = useGetTask({
+    taskId,
+    onSuccess: (task) => reset(task),
   });
 
   const handleSaveClick = async (data) => {

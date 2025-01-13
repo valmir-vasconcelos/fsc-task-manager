@@ -5,27 +5,14 @@ import LoaderIcon from "../assets/icons/loader.svg?react";
 import TrashIcon from "../assets/icons/trash.svg?react";
 import Button from "./Button";
 import { Link } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useDeleteTask } from "../hooks/data/use-delete-task";
 
 const TaskItem = ({ task, handleCheckboxClick }) => {
-  const queryClient = useQueryClient();
-
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["deleteTask", task.id],
-    mutationFn: async () => {
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-        method: "DELETE",
-      });
-      return response.json();
-    },
-  });
+  const { mutate: mutateDeleteTask, isPending } = useDeleteTask(task.id);
 
   const handleDeleteClick = async () => {
-    mutate(undefined, {
+    mutateDeleteTask(undefined, {
       onSuccess: () => {
-        queryClient.setQueryData("tasks", (currentTasks) => {
-          return currentTasks.filter((oldTask) => oldTask.id !== task.id);
-        });
         toast.success("Tarefa deletada com sucesso");
       },
       onError: () => {
