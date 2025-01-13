@@ -1,13 +1,6 @@
 {
   "tasks": [
     {
-      "id": "0e3db28d-8b75-45ca-bdff-906d868171ac",
-      "title": "Ler",
-      "description": "Ler livro sobre finanças",
-      "time": "morning",
-      "status": "done"
-    },
-    {
       "id": "b4f922f3-2b48-4a1b-b37d-ee3ad07fc37d",
       "title": "Estudar",
       "description": "Estudar programação javascript",
@@ -40,6 +33,13 @@
       "title": "Descansar",
       "description": "Assitir um filme com a família",
       "time": "evening",
+      "status": "not_started"
+    },
+    {
+      "id": "c1c4b6b0-c7e3-44d2-a808-2a308a460ead",
+      "title": "Ler",
+      "description": "Ler livro sobre finanças",
+      "time": "morning",
       "status": "not_started"
     }
   ]
