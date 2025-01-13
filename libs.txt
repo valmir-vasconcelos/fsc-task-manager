@@ -34,3 +34,6 @@ npm install react-hook-form@7.52.1
 
 // react query
 npm install @tanstack/react-query@5.51.21
+
+// axios
+npm install axios@1.7.7

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "../../lib/axios";
 
 export const useUpdateTask = (taskId) => {
 
@@ -7,20 +8,12 @@ export const useUpdateTask = (taskId) => {
     return useMutation({
         mutationKey: ["updateTask", taskId],
         mutationFn: async (updateData) => {
-            const response = await fetch(`http://localhost:3000/tasks/${taskId}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    title: updateData.title.trim(),
-                    description: updateData.description.trim(),
-                    time: updateData.time.trim(),
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error();
+            const { data: updatedTask } = await api.patch(`/tasks/${taskId}`, {
+                title: updateData.title.trim(),
+                description: updateData.description.trim(),
+                time: updateData.time.trim(),
             }
-
-            const updatedTask = await response.json();
+            )
 
             // atualiza o Cache
             queryClient.setQueryData("tasks", (oldTasks) => {
@@ -31,6 +24,7 @@ export const useUpdateTask = (taskId) => {
                     return oldTask;
                 });
             });
+            queryClient.setQueryData(["task", taskId], updatedTask)
         },
     });
 }
