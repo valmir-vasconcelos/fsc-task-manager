@@ -6,9 +6,12 @@ import TrashIcon from "../assets/icons/trash.svg?react";
 import Button from "./Button";
 import { Link } from "react-router-dom";
 import { useDeleteTask } from "../hooks/data/use-delete-task";
+import { useUpdateTask } from "../hooks/data/use-update-task";
 
-const TaskItem = ({ task, handleCheckboxClick }) => {
+const TaskItem = ({ task }) => {
   const { mutate: mutateDeleteTask, isPending } = useDeleteTask(task.id);
+
+  const { mutate: mutateUpdateTask } = useUpdateTask(task.id);
 
   const handleDeleteClick = async () => {
     mutateDeleteTask(undefined, {
@@ -19,6 +22,31 @@ const TaskItem = ({ task, handleCheckboxClick }) => {
         toast.error("Erro ao deletar tarefa");
       },
     });
+  };
+
+  const getNewStatus = () => {
+    if (task.status === "not_started") {
+      return "in_progress";
+    }
+    if (task.status === "in_progress") {
+      return "done";
+    }
+    return "not_started";
+  };
+
+  const handleCheckboxClick = () => {
+    mutateUpdateTask(
+      {
+        status: getNewStatus(),
+      },
+      {
+        onSuccess: () =>
+          toast.success("Status da tarefa atualizado com sucesso"),
+      },
+      {
+        onError: () => toast.error("Erro ao atualizar status da tarefa"),
+      }
+    );
   };
 
   const getStatusClasses = () => {
@@ -43,7 +71,7 @@ const TaskItem = ({ task, handleCheckboxClick }) => {
             type="checkbox"
             checked={task.status === "done"}
             className="absolute h-full w-full cursor-pointer opacity-0"
-            onChange={() => handleCheckboxClick(task.id)}
+            onChange={handleCheckboxClick}
           />
           {task.status === "done" && <CheckIcon />}
           {task.status === "in_progress" && (

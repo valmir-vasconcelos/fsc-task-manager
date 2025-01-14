@@ -10,9 +10,10 @@ export const useUpdateTask = (taskId) => {
     mutationKey: taskMutationKeys.update(taskId),
     mutationFn: async (updateData) => {
       const { data: updatedTask } = await api.patch(`/tasks/${taskId}`, {
-        title: updateData.title.trim(),
-        description: updateData.description.trim(),
-        time: updateData.time.trim(),
+        title: updateData?.title?.trim(),
+        description: updateData?.description?.trim(),
+        time: updateData?.time?.trim(),
+        status: updateData?.status?.trim()
       });
 
       // atualiza o Cache
